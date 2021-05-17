@@ -42,22 +42,7 @@
     "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
-     "azureFirewallSubnetJSON": "[json(format('{{\"id\": \"{0}\"}}', variables('azureFirewallSubnetId')))]",
-    "copy": [
-      {
-        "name": "azureFirewallIpConfigurations",
-        "count": "[parameters('numberOfFirewallPublicIPAddresses')]",
-        "input": {
-          "name": "[concat('IpConf', copyIndex('azureFirewallIpConfigurations'))]",
-          "properties": {
-            "subnet": "[if(equals(copyIndex('azureFirewallIpConfigurations'), 0), variables('azureFirewallSubnetJSON'), json('null'))]",
-            "publicIPAddress": {
-              "id": "[concat(variables('azureFirewallPublicIpId'), add(copyIndex('azureFirewallIpConfigurations'), 1))]"
-            }
-          }
-        }
-      }
-    ]
+     "azureFirewallSubnetJSON": "[json(format('{{\"id\": \"{0}\"}}', variables('azureFirewallSubnetId')))]"
   },
   "resources": [
      {
