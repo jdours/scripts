@@ -303,7 +303,6 @@
       }
     },
     {
-
       "apiVersion": "2019-11-01",
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "name": "[concat(variables('Spoke2VnetName'), '/gwPeering_', variables('Spoke2VnetName'), '_', variables('hubVnetName'))]",
@@ -326,4 +325,5 @@
         }
       }
     }
+	]
 }
