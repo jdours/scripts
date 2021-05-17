@@ -1,5 +1,9 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+	
 "variables": {
-    "location": "eastus"
+    "location": "eastus",
     "hubVnetName": "Hub-VNET",
     "hubVnetPrefix": "10.0.0.0/16",
     "mgmtSubnetName": "ManagementSubnet",
@@ -25,28 +29,9 @@
     "mgmtSubnetNSG": "mgmtSubnetNSG",
     "spoke1WorkloadSubnetNSG": "spoke1WorkloadSubnetNSG",
     "spoke2WorkloadSubnetNSG": "spoke2WorkloadSubnetNSG",
-    "azureFirewallSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('hubVnetName'), 'AzureFirewallSubnet')]",
-    "azureFirewallPublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('firewalPublicIPAddress'))]",
-    "firewalPublicIPAddress": "fwpublic_ip",
     "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
-     "azureFirewallSubnetJSON": "[json(format('{{\"id\": \"{0}\"}}', variables('azureFirewallSubnetId')))]",
-    "copy": [
-      {
-        "name": "azureFirewallIpConfigurations",
-        "count": "[parameters('numberOfFirewallPublicIPAddresses')]",
-        "input": {
-          "name": "[concat('IpConf', copyIndex('azureFirewallIpConfigurations'))]",
-          "properties": {
-            "subnet": "[if(equals(copyIndex('azureFirewallIpConfigurations'), 0), variables('azureFirewallSubnetJSON'), json('null'))]",
-            "publicIPAddress": {
-              "id": "[concat(variables('azureFirewallPublicIpId'), add(copyIndex('azureFirewallIpConfigurations'), 1))]"
-            }
-          }
-        }
-      }
-    ]
   },
   
    {
@@ -399,3 +384,4 @@
       }
     }
   ],
+  }
