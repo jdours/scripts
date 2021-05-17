@@ -8,7 +8,8 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
+    }
+	},
   "variables": {
     "hubVnetName": "grpeunpnet01",
     "hubVnetPrefix": "10.102.0.0/16",
@@ -143,7 +144,7 @@
       "apiVersion": "2019-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]"
       ],
       "properties": {
         "addressPrefix": "[variables('gatewaySubnetPrefix')]"
