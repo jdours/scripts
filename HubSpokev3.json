@@ -6,7 +6,17 @@
         "description": "Location for all resources."
       }
     },
-
+      "numberOfFirewallPublicIPAddresses": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 100,
+      "metadata": {
+        "description": "Number of public IP addresses for the Azure Firewall"
+      }
+    }
+  },
+	
 "variables": {
     "hubVnetName": "Hub-VNET",
     "hubVnetPrefix": "10.0.0.0/16",
