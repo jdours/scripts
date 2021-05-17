@@ -32,7 +32,7 @@
     "spoke2WorkloadSubnetNSG": "spoke2WorkloadSubnetNSG",
     "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
-    "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
+    "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]"
   },
   "resources": [
      {
@@ -326,5 +326,4 @@
         }
       }
     }
-  ],
 }
