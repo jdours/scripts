@@ -1,5 +1,5 @@
 "variables": {
-	"location": "eastus"
+    "location": "eastus"
     "hubVnetName": "Hub-VNET",
     "hubVnetPrefix": "10.0.0.0/16",
     "mgmtSubnetName": "ManagementSubnet",
