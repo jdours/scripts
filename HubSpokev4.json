@@ -178,7 +178,6 @@
       "apiVersion": "2019-11-01",
       "location": "[parameters('location')]",
         "dependsOn": [
-    "[resourceId('Microsoft.Network/routeTables', variables('spoke2RouteTableName'))]",
     "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke2WorkloadSubnetNSG'))]"
       ],
       "properties": {
@@ -202,7 +201,6 @@
       "properties": {
         "addressPrefix": "[variables('Spoke2WorkloadSubnetPrefix')]",
           "routeTable": {
-                "id": "[resourceId('Microsoft.Network/routeTables', variables('spoke2RouteTableName'))]"
               },
                "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
