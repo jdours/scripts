@@ -9,7 +9,7 @@
         "description": "Location for all resources."
       }
     }
-	},
+  },
   "variables": {
     "hubVnetName": "grpeunpnet01",
     "hubVnetPrefix": "10.102.0.0/16",
