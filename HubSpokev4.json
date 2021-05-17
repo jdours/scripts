@@ -30,8 +30,6 @@
     "Spoke1WorkloadSubnetPrefix": "10.103.0.0/24",
     "Spoke2WorkloadSubnetPrefix": "10.104.0.0/24",
     "nextHopIP": "10.102.2.4",
-    "spoke1RouteTableName": "Spoke1RouteTable",
-    "spoke2RouteTableName": "Spoke2RouteTable",
     "firewallName": "FW-01",
     "mgmtSubnetNSG": "mgmtSubnetNSG",
     "spoke1WorkloadSubnetNSG": "spoke1WorkloadSubnetNSG",
