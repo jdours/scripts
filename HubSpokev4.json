@@ -15,8 +15,6 @@
     "hubVnetPrefix": "10.102.0.0/16",
     "mgmtSubnetName": "ManagementSubnet",
     "mgmtSubnetPrefix": "10.102.1.0/24",
-    "azureFirewallSubnetName": "AzureFirewallSubnet",
-    "azureFirewallSubnetPrefix": "10.102.2.0/26",
     "gatewaySubnetName": "GatewaySubnet",
     "gatewaySubnetPrefix": "10.102.3.0/27",
     "gatewayName": "hubVpnGateway",
@@ -29,18 +27,12 @@
     "spokeWorkloadSubnetName": "WorkloadSubnet",
     "Spoke1WorkloadSubnetPrefix": "10.103.0.0/24",
     "Spoke2WorkloadSubnetPrefix": "10.104.0.0/24",
-    "nextHopIP": "10.102.2.4",
-    "firewallName": "FW-01",
     "mgmtSubnetNSG": "mgmtSubnetNSG",
     "spoke1WorkloadSubnetNSG": "spoke1WorkloadSubnetNSG",
     "spoke2WorkloadSubnetNSG": "spoke2WorkloadSubnetNSG",
-    "azureFirewallSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('hubVnetName'), 'AzureFirewallSubnet')]",
-    "azureFirewallPublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('firewalPublicIPAddress'))]",
-    "firewalPublicIPAddress": "fwpublic_ip",
     "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
-     "azureFirewallSubnetJSON": "[json(format('{{\"id\": \"{0}\"}}', variables('azureFirewallSubnetId')))]"
   },
   "resources": [
      {
@@ -162,8 +154,6 @@
       ],
       "properties": {
         "addressPrefix": "[variables('Spoke1WorkloadSubnetPrefix')]",
-         "routeTable": {
-              },
          "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
               }
@@ -198,8 +188,6 @@
       ],
       "properties": {
         "addressPrefix": "[variables('Spoke2WorkloadSubnetPrefix')]",
-          "routeTable": {
-              },
                "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
               }
@@ -339,8 +327,4 @@
       }
     }
   ],
-  
-  "outputs": {
-
-  }
 }
