@@ -27,13 +27,6 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
-	"nicNameWindows": {
-      "type": "string",
-      "defaultValue": "nic-windows-",
-      "metadata": {
-        "description": "The name of NIC."
-      }
     }
   },
   "variables": {
@@ -60,8 +53,12 @@
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
+    "nicNameWindows": "nic-windows-",
     "vmNameWindows": "vm-windows-",
-    "windowsOSVersion": "2019-Datacenter"
+    "windowsOSVersion": "2016-Datacenter",
+    "nicNameLinux": "nic-linux-",
+    "osVersion": "16.04.0-LTS",
+    "vmNameLinux": "vm-linux-"
   },
   "resources": [
      {
@@ -286,82 +283,14 @@
         }
       }
     },
-    {
-      "apiVersion": "2019-11-01",
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "name": "[concat(variables('hubVnetName'), '/gwPeering_', variables('hubVnetName'), '_', variables('Spoke2VnetName'))]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeSubnetName'))]"
-      ],
-      "properties": {
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": true,
-        "useRemoteGateways": false,
-        "remoteVirtualNetwork": {
-          "id": "[variables('Spoke2ID')]"
-        }
-      }
-    },
-    {
-      "apiVersion": "2019-11-01",
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "name": "[concat(variables('Spoke1VnetName'), '/gwPeering_', variables('Spoke1VnetName'), '_', variables('hubVnetName'))]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
-      ],
-      "properties": {
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": false,
-        "useRemoteGateways": true,
-        "remoteVirtualNetwork": {
-          "id": "[variables('hubID')]"
-        }
-      }
-    },
-    {
-      "apiVersion": "2019-11-01",
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "name": "[concat(variables('Spoke2VnetName'), '/gwPeering_', variables('Spoke2VnetName'), '_', variables('hubVnetName'))]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeSubnetName'))]",
-         "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
-      ],
-      "properties": {
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": false,
-        "useRemoteGateways": true,
-        "remoteVirtualNetwork": {
-          "id": "[variables('hubID')]"
-        }
-      }
-    },
-	{
+        {
             "comments": "Network interface for Windows VMs (optional)",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('nicNameWindows'), copyIndex(1))]",
+            "name": "[concat(variables('nicNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName').name)]"
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('spokeNetwork').name)]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -370,7 +299,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName').name, parameters('Spoke1VnetName').subnetName)]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('spokeNetwork').name, parameters('spokeNetwork').subnetName)]"
                             }
                         }
                     }
@@ -385,17 +314,17 @@
             "comments": "Windows VMs (optional)",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
-            "name": "[concat(variables('vmNameWindows'), copyIndex(1))]",
+            "name": "[concat(variables('vmNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-				"[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('nickNameWindows'), copyIndex(1)))]"
+                "[concat(variables('nicNameWindows'), copyIndex())]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(variables('vmNameWindows'), copyIndex(1))]",
+                    "computerName": "[concat(variables('vmNameWindows'), copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -413,7 +342,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('nickNameWindows'), copyIndex(1)))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex()))]"
                         }
                     ]
                 }
@@ -421,6 +350,75 @@
             "copy": {
                 "name": "vmcopy",
                 "count": "[parameters('windowsVMCount')]"
+            }
+        },
+        {
+            "comments": "Network interface for Ubuntu VMs (optional)",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(variables('nicNameLinux'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('spokeNetwork').name)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('spokeNetwork').name, parameters('spokeNetwork').subnetName)]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "niccopy",
+                "count": "[parameters('linuxVMCount')]"
+            }
+        },
+        {
+            "comments": "Ubuntu VMs (optional)",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "name": "[concat(variables('vmNameLinux'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat(variables('nicNameLinux'), copyIndex())]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('vmNameLinux'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "[variables('osVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameLinux'), copyIndex()))]"
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "vmcopy",
+                "count": "[parameters('linuxVMCount')]"
             }
         }
 	
