@@ -28,6 +28,12 @@
         "description": "Location for all resources."
       }
     }
+	"nicName": {
+            "type": "string",
+            "defaultValue": "nic-vm-",
+            "metadata": {
+                "description": "The name of NIC."
+            }
   },
   "variables": {
     "hubVnetName": "HubVNET",
@@ -43,17 +49,17 @@
     "Spoke1VnetPrefix": "10.1.0.0/16",
     "Spoke2VnetName": "Spoke2VNET",
     "Spoke2VnetPrefix": "10.2.0.0/16",
-    "spokeWorkloadSubnetName": "WorkloadSubnet",
-    "Spoke1WorkloadSubnetPrefix": "10.1.0.0/24",
-    "Spoke2WorkloadSubnetPrefix": "10.2.0.0/24",
+    "spokeSubnetName": "Subnet",
+    "Spoke1SubnetPrefix": "10.1.0.0/24",
+    "Spoke2SubnetPrefix": "10.2.0.0/24",
     "mgmtSubnetNSG": "mgmtSubnetNSG",
-    "spoke1WorkloadSubnetNSG": "spoke1WorkloadSubnetNSG",
-    "spoke2WorkloadSubnetNSG": "spoke2WorkloadSubnetNSG",
+    "spoke1SubnetNSG": "spoke1SubnetNSG",
+    "spoke2SubnetNSG": "spoke2SubnetNSG",
     "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
-	"nicName": "nic-vm-x",
+	"nicName": "nic-vm-",
     "vmNameWindows": "vm-windows-x",
     "windowsOSVersion": "2019-Datacenter"
   },
@@ -82,7 +88,7 @@
       }
     },
     {
-      "name": "[variables('spoke1WorkloadSubnetNSG')]",
+      "name": "[variables('spoke1SubnetNSG')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-04-01",
       "location": "[parameters('location')]",
@@ -92,7 +98,7 @@
       }
     },
     {
-      "name": "[variables('spoke2WorkloadSubnetNSG')]",
+      "name": "[variables('spoke2SubnetNSG')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-04-01",
       "location": "[parameters('location')]",
@@ -155,7 +161,7 @@
       "apiVersion": "2019-11-01",
       "location": "[parameters('location')]",
        "dependsOn": [
-    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
+    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -168,17 +174,17 @@
       }
     },
     {
-      "comments": "Spoke 1 Workload Subnet",
+      "comments": "Spoke 1 Subnet",
       "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[concat(variables('Spoke1VnetName'), '/', variables('spokeWorkloadSubnetName'))]",
+      "name": "[concat(variables('Spoke1VnetName'), '/', variables('spokeSubnetName'))]",
       "apiVersion": "2019-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]"
       ],
       "properties": {
-        "addressPrefix": "[variables('Spoke1WorkloadSubnetPrefix')]",
+        "addressPrefix": "[variables('Spoke1SubnetPrefix')]",
          "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
               }
       }      
     },
@@ -189,7 +195,7 @@
       "apiVersion": "2019-11-01",
       "location": "[parameters('location')]",
         "dependsOn": [
-    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke2WorkloadSubnetNSG'))]"
+    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke2SubnetNSG'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -202,17 +208,17 @@
       }
     },
     {
-      "comments": "Spoke 2 Workload Subnet",
+      "comments": "Spoke 2 Subnet",
       "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[concat(variables('Spoke2VnetName'), '/', variables('spokeWorkloadSubnetName'))]",
+      "name": "[concat(variables('Spoke2VnetName'), '/', variables('spokeSubnetName'))]",
       "apiVersion": "2019-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]"
       ],
       "properties": {
-        "addressPrefix": "[variables('Spoke2WorkloadSubnetPrefix')]",
+        "addressPrefix": "[variables('Spoke2SubnetPrefix')]",
                "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1WorkloadSubnetNSG'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
               }
       }
     },
@@ -268,7 +274,7 @@
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeWorkloadSubnetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -290,7 +296,7 @@
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeWorkloadSubnetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeSubnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -312,7 +318,7 @@
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeWorkloadSubnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
       ],
       "properties": {
@@ -335,7 +341,7 @@
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeWorkloadSubnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke2VnetName'), variables('spokeSubnetName'))]",
          "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
       ],
       "properties": {
@@ -352,7 +358,7 @@
             "comments": "Network interface for Windows VMs (optional)",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-05-01",
-            "name": "[concat(variables('nicName'), copyIndex())]",
+            "name": "[concat(parameters('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName').name)]"
@@ -382,7 +388,7 @@
             "name": "[concat(variables('vmNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(variables('nicName'), copyIndex())]"
+                "[concat(parameters('nicName'), copyIndex())]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -407,7 +413,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyIndex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('nicName'), copyIndex()))]"
                         }
                     ]
                 }
