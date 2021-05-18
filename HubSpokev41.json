@@ -27,7 +27,7 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    }
+    },
 	"nicName": {
             "type": "string",
             "defaultValue": "nic-vm-",
