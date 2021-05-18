@@ -29,7 +29,7 @@
       }
     },
 	"nicNameWindows": {
-      "type": "aray",
+      "type": "array",
       "defaultValue": "nic-windows-",
       "metadata": {
         "description": "The name of NIC."
