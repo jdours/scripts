@@ -53,8 +53,8 @@
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
-	"nicName": "nic-vm-",
-    "vmNameWindows": "vm-windows-",
+	"nicName": "nic-vm-x",
+    "vmNameWindows": "vm-windows-x",
     "windowsOSVersion": "2019-Datacenter"
   },
   "resources": [
