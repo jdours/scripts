@@ -383,7 +383,6 @@
             "location": "[parameters('location')]",
             "dependsOn": [
 				"[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex(1)))]"
-
             ],
             "properties": {
                 "hardwareProfile": {
