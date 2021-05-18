@@ -413,7 +413,7 @@
                 "name": "vmcopy",
                 "count": "[parameters('windowsVMCount')]"
             }
-        },
+        }
 	
 	]
 }
