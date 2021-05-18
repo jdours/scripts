@@ -27,6 +27,13 @@
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+	"vmNameWindows": {
+      "type": "aray",
+      "defaultValue": "nic-windows-",
+      "metadata": {
+        "description": "The name of NIC."
+      }
     }
   },
   "variables": {
@@ -379,7 +386,7 @@
             "comments": "Windows VMs (optional)",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
-            "name": "[concat(variables('vmNameWindows'), copyIndex(1))]",
+            "name": "[concat(parameters('vmNameWindows'), copyIndex(1))]",
             "location": "[parameters('location')]",
             "dependsOn": [
 				"[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex(1)))]"
@@ -389,7 +396,7 @@
                     "vmSize": "[variables('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(variables('vmNameWindows'), copyIndex(1))]",
+                    "computerName": "[concat(parameters('vmNameWindows'), copyIndex(1))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
