@@ -53,7 +53,7 @@
     "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
-	"nicNameWindows": "nic-windows-",
+	"nicName": "nic-",
     "vmNameWindows": "vm-windows-",
     "windowsOSVersion": "2019-Datacenter"
   },
@@ -352,7 +352,7 @@
             "comments": "Network interface for Windows VMs (optional)",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-05-01",
-            "name": "[concat(variables('nicNameWindows'), copyIndex())]",
+            "name": "[concat(variables('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('Spoke1VnetName').name)]"
@@ -382,7 +382,7 @@
             "name": "[concat(variables('vmNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(variables('nicNameWindows'), copyIndex())]"
+                "[concat(variables('nicName'), copyIndex())]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -407,7 +407,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyIndex()))]"
                         }
                     ]
                 }
