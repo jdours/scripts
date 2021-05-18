@@ -55,8 +55,7 @@
 	"vmSize": "Standard_A1_v2",
     "nicNameWindows": "nic-windows-",
     "vmNameWindows": "vm-windows-",
-    "windowsOSVersion": "2016-Datacenter",
-
+    "windowsOSVersion": "2019-Datacenter"
   },
   "resources": [
      {
