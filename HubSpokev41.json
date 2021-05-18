@@ -297,7 +297,7 @@
             "name": "[concat(variables('nicNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('Spoke1SubnetPrefix').name)]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -306,7 +306,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('Spoke1SubnetPrefix').name, parameters('Spoke1SubnetPrefix').subnetName)]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName')]"
                             }
                         }
                     }
@@ -366,7 +366,7 @@
             "name": "[concat(variables('nicNameLinux'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('Spoke1SubnetPrefix').name)]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -375,7 +375,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('Spoke1SubnetPrefix').name, parameters('Spoke1SubnetPrefix').subnetName)]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName')]"
                             }
                         }
                     }
