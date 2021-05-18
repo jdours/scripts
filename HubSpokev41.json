@@ -28,7 +28,7 @@
         "description": "Location for all resources."
       }
     },
-	"vmNameWindows": {
+	"nicNameWindows": {
       "type": "aray",
       "defaultValue": "nic-windows-",
       "metadata": {
@@ -61,7 +61,6 @@
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
     "vmNameWindows": "vm-windows-",
-	"nicNameWindows": "nic-windows-",
     "windowsOSVersion": "2019-Datacenter"
   },
   "resources": [
