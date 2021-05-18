@@ -297,7 +297,7 @@
             "name": "[concat(variables('nicNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName')]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
