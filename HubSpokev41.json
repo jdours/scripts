@@ -11,7 +11,7 @@
     "adminPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "The admin password for both the Windows and Linux virtual machines."
+                "description": "The admin password for virtual machines."
             }
         },
     "windowsVMCount": {
@@ -27,14 +27,7 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
-	"nicName": {
-            "type": "string",
-            "defaultValue": "nic-vm-",
-            "metadata": {
-                "description": "The name of NIC."
-            }
-		}
+    }
   },
   "variables": {
     "hubVnetName": "HubVNET",
@@ -61,6 +54,7 @@
     "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
 	"vmSize": "Standard_A1_v2",
     "vmNameWindows": "vm-windows-x",
+	"nicNameWindows": "nic-windows-",
     "windowsOSVersion": "2019-Datacenter"
   },
   "resources": [
@@ -358,7 +352,7 @@
             "comments": "Network interface for Windows VMs (optional)",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('nicName'), copyIndex())]",
+            "name": "[concat(variables('nicNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName').name)]"
@@ -388,7 +382,7 @@
             "name": "[concat(variables('vmNameWindows'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(parameters('nicName'), copyIndex())]"
+                "[concat(variables('nicNameWindows'), copyIndex())]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -413,7 +407,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('nicName'), copyIndex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex()))]"
                         }
                     ]
                 }
