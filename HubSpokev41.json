@@ -355,7 +355,7 @@
             "name": "[concat(variables('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('Spoke1VnetName').name)]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName').name)]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -364,7 +364,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('Spoke1VnetName').name, parameters('Spoke1VnetName').subnetName)]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName').name, parameters('Spoke1VnetName').subnetName)]"
                             }
                         }
                     }
