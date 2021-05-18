@@ -352,7 +352,7 @@
             "comments": "Network interface for Windows VMs (optional)",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-05-01",
-            "name": "[concat(variables('nicNameWindows'), copyIndex())]",
+            "name": "[concat(variables('nicNameWindows'), copyIndex(1))]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName').name)]"
@@ -379,17 +379,17 @@
             "comments": "Windows VMs (optional)",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
-            "name": "[concat(variables('vmNameWindows'), copyIndex())]",
+            "name": "[concat(variables('vmNameWindows'), copyIndex(1))]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(variables('nicNameWindows'), copyIndex())]"
+                "[concat(variables('nicNameWindows'), copyIndex(1))]"
             ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[variables('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(variables('vmNameWindows'), copyIndex())]",
+                    "computerName": "[concat(variables('vmNameWindows'), copyIndex(1))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -407,7 +407,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex(1)))]"
                         }
                     ]
                 }
