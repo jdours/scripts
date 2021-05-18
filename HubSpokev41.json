@@ -382,7 +382,8 @@
             "name": "[concat(variables('vmNameWindows'), copyIndex(1))]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(variables('nicNameWindows'), copyIndex(1))]"
+				"[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex(1)))]"
+
             ],
             "properties": {
                 "hardwareProfile": {
