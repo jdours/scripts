@@ -20,13 +20,6 @@
             "metadata": {
                 "description": "The count of Windows virtual machines to create."
             }
-        },
-	"linuxVMCount": {
-            "type": "int",
-            "defaultValue": 0,
-            "metadata": {
-                "description": "The count of Linux virtual machines to create."
-            }
         },	
     "location": {
       "type": "string",
@@ -62,10 +55,7 @@
 	"vmSize": "Standard_A1_v2",
     "nicNameWindows": "nic-windows-",
     "vmNameWindows": "vm-windows-",
-    "windowsOSVersion": "2019-Datacenter",
-    "nicNameLinux": "nic-linux-",
-    "osVersion": "16.04.0-LTS",
-    "vmNameLinux": "vm-linux-"
+    "windowsOSVersion": "2019-Datacenter"
   },
   "resources": [
      {
@@ -358,76 +348,6 @@
                 "name": "vmcopy",
                 "count": "[parameters('windowsVMCount')]"
             }
-        },
-        {
-            "comments": "Network interface for Ubuntu VMs (optional)",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-05-01",
-            "name": "[concat(variables('nicNameLinux'), copyIndex())]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]"
-                            }
-                        }
-                    }
-                ]
-            },
-            "copy": {
-                "name": "niccopy",
-                "count": "[parameters('linuxVMCount')]"
-            }
-        },
-        {
-            "comments": "Ubuntu VMs (optional)",
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-07-01",
-            "name": "[concat(variables('vmNameLinux'), copyIndex())]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat(variables('nicNameLinux'), copyIndex())]"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[concat(variables('vmNameLinux'), copyIndex())]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "Canonical",
-                        "offer": "UbuntuServer",
-                        "sku": "[variables('osVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameLinux'), copyIndex()))]"
-                        }
-                    ]
-                }
-            },
-            "copy": {
-                "name": "vmcopy",
-                "count": "[parameters('linuxVMCount')]"
-            }
-        }
-	
+        }	
 	]
 }
