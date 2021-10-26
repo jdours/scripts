@@ -1,0 +1,353 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+	"adminUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "The admin user name for both the Windows and Linux virtual machines."
+            }
+        },
+    "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The admin password for virtual machines."
+            }
+        },
+    "windowsVMCount": {
+            "type": "int",
+            "defaultValue": 0,
+            "metadata": {
+                "description": "The count of Windows virtual machines to create."
+            }
+        },	
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    }
+  },
+  "variables": {
+    "hubVnetName": "HubVNET",
+    "hubVnetPrefix": "192.168.250.0/24",
+    "mgmtSubnetName": "ManagementSubnet",
+    "mgmtSubnetPrefix": "192.168.250.64/27",
+    "gatewaySubnetName": "GatewaySubnet",
+    "gatewaySubnetPrefix": "192.168.250.0/27",
+    "gatewayName": "hubVpnGateway",
+    "gatewayPIPName": "hubVpnGatewayPublicIp",
+    "subnetGatewayId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
+    "Spoke1VnetName": "Spoke1VNET",
+    "Spoke1VnetPrefix": "192.168.201.0/24",
+    "Spoke2VnetName": "Spoke2VNET",
+    "Spoke2VnetPrefix": "192.168.202.0/24",
+    "spokeSubnetName": "Subnet",
+    "Spoke1SubnetPrefix": "192.168.201.0/24",
+    "Spoke2SubnetPrefix": "192.168.202.0/24"",
+    "mgmtSubnetNSG": "mgmtSubnetNSG",
+    "spoke1SubnetNSG": "spoke1SubnetNSG",
+    "spoke2SubnetNSG": "spoke2SubnetNSG",
+    "hubID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+    "Spoke1ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke1VnetName'))]",
+    "Spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('Spoke2VnetName'))]",
+	"vmSize": "Standard_A1_v2",
+    "nicNameWindows": "nic-windows-",
+    "vmNameWindows": "vm-windows-",
+    "windowsOSVersion": "2019-Datacenter"
+  },
+  "resources": [
+     {
+      "name": "[variables('mgmtSubnetNSG')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-04-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "RDP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('spoke1SubnetNSG')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-04-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+        ]
+      }
+    },
+    {
+      "name": "[variables('spoke2SubnetNSG')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-04-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+        ]
+      }
+    },
+    {
+      "comments": "HUB Virtual Network (VNet)",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('hubVnetName')]",
+      "apiVersion": "2019-11-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mgmtSubnetNSG'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('hubVnetPrefix')]"
+          ]
+        },
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "comments": "Management Subnet",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('hubVnetName'), '/', variables('mgmtSubnetName'))]",
+      "apiVersion": "2019-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('mgmtSubnetPrefix')]",
+         "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mgmtSubnetNSG'))]"
+              }
+      }
+    },
+    {
+      "comments": "Gateway Subnet",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('hubVnetName'), '/', variables('gatewaySubnetName'))]",
+      "apiVersion": "2019-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('gatewaySubnetPrefix')]"
+      }
+    },
+    {
+      "comments": "Spoke 1 Spoke Virtual Network (VNet)",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('Spoke1VnetName')]",
+      "apiVersion": "2019-11-01",
+      "location": "[parameters('location')]",
+       "dependsOn": [
+    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('Spoke1VnetPrefix')]"
+          ]
+        },
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "comments": "Spoke 1 Subnet",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('Spoke1VnetName'), '/', variables('spokeSubnetName'))]",
+      "apiVersion": "2019-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('Spoke1SubnetPrefix')]",
+         "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
+              }
+      }      
+    },
+    {
+      "comments": "Spoke 2 Spoke Virtual Network (VNet)",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('Spoke2VnetName')]",
+      "apiVersion": "2019-11-01",
+      "location": "[parameters('location')]",
+        "dependsOn": [
+    "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke2SubnetNSG'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('Spoke2VnetPrefix')]"
+          ]
+        },
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "comments": "Spoke 2 Subnet",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(variables('Spoke2VnetName'), '/', variables('spokeSubnetName'))]",
+      "apiVersion": "2019-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke2VnetName'))]"
+      ],
+      "properties": {
+        "addressPrefix": "[variables('Spoke2SubnetPrefix')]",
+               "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke1SubnetNSG'))]"
+              }
+      }
+    },
+        {
+      "apiVersion": "2019-11-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('gatewayPIPName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2019-11-01",
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[variables('gatewayName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPIPName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetGatewayId')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPIPName'))]"
+              }
+            },
+            "name": "vnetGatewayConfig"
+          }
+        ],
+        "sku": {
+          "name": "VpnGw1",
+          "tier": "VpnGw1"
+        },
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "enableBgp": false
+      }
+    },
+    {
+      "apiVersion": "2019-11-01",
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "name": "[concat(variables('hubVnetName'), '/Peering_', variables('hubVnetName'), '_', variables('Spoke1VnetName'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('mgmtSubnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]"
+      ],
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": true,
+        "allowGatewayTransit": true,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[variables('Spoke1ID')]"
+        }
+      }
+    },
+        {
+            "comments": "Network interface for Windows VMs (optional)",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(variables('nicNameWindows'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Spoke1VnetName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Spoke1VnetName'), variables('spokeSubnetName'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "niccopy",
+                "count": "[parameters('windowsVMCount')]"
+            }
+        },
+        {
+            "comments": "Windows VMs (optional)",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "name": "[concat(variables('vmNameWindows'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat(variables('nicNameWindows'), copyIndex())]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('vmNameWindows'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[variables('windowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicNameWindows'), copyIndex()))]"
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "vmcopy",
+                "count": "[parameters('windowsVMCount')]"
+            }
+        }	
+	]
+}
