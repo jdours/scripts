@@ -45,7 +45,7 @@
     "Spoke2VnetPrefix": "192.168.202.0/24",
     "spokeSubnetName": "Subnet",
     "Spoke1SubnetPrefix": "192.168.201.0/24",
-    "Spoke2SubnetPrefix": "192.168.202.0/24"",
+    "Spoke2SubnetPrefix": "192.168.202.0/24",
     "mgmtSubnetNSG": "mgmtSubnetNSG",
     "spoke1SubnetNSG": "spoke1SubnetNSG",
     "spoke2SubnetNSG": "spoke2SubnetNSG",
